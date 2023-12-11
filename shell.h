@@ -31,7 +31,7 @@
 #define USE_GETLINE 0
 #define USE_STRTOK 0
 
-#define HIST_FILE".simple_shell_history"
+#define HISTORY_FILE ".simple_shell_history"
 #define HIST_MAX4096
 
 extern char **environ;
@@ -127,10 +127,10 @@ int define_alias(info_t *shell_info, char *str);
 int custom_alias(info_t *shell_info);
 
 /* definition_environ.c */
-char *get_environment(info_t *shell_info, const char *name);
+char *_get_environment(info_t *shell_info, const char *name);
 int custom_environment(info_t *shell_info);
 int set_environment(info_t *shell_info);
-Int remove_environment(info_t *shell_info);
+int remove_environment(info_t *shell_info);
 int populate_environment_list(info_t *shell_info);
 
 /* definition_errors.c */
@@ -140,7 +140,7 @@ int print_to_fd(char c, int fd);
 int print_string_to_fd(char *str, int fd);
 
 /* definition_errors1.c */
-int string_to_integer(char *s);
+int _custom_atoi(char *s);
 void print_error_message(info_t *shell_info, char *error_str);
 int print_decimal(int input, int fd);
 char *convert_to_string(long int num, int base, int flags);
@@ -201,7 +201,7 @@ void check_cmd_chain(info_t *shell_info, char *buffer,
 size_t *position, size_t start, size_t length);
 int replace_cmd_alias(info_t *shell_info);
 int replace_cmd_vars(info_t *shell_info);
-replace_string_content(char **old_content, int  char *new_content);
+int replace_string_content(char **old_content, char *new_content);
 
 /*definition - tokenizer.c*/
 char **split_string(char *str, char *delimiters);
