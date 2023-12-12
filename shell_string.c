@@ -18,12 +18,12 @@ return (length);
 }
 
 /**
-* _strcmp - performs lexicographic comparison of two strings.
+*str_compare - performs lexicographic comparison of two strings.
 * @s1: the first string
 * @s2: the second string
 * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
 */
-int _strcmp(char *s1, char *s2)
+int str_compare(char *s1, char *s2)
 {
 while (*s1 && *s2)
 {
@@ -53,12 +53,12 @@ return ((char *)haystack);
 }
 
 /**
-* _strcat - concatenates two strings
+* string_concat - concatenates two strings
 * @destination: the destination buffer
 * @source: the source buffer
 * Return: pointer to destination buffer
 */
-char *_strcat(char *destination, char *source)
+char *string_concat(char *destination, char *source)
 {
 char *result = destination;
 
