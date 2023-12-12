@@ -14,25 +14,25 @@ int builtin_return = 0;
 
 while (read_status != -1 && builtin_return != -2)
 {
-clear_info(shell_info);
-if (is_interactive(shell_info))
+initialize_info(shell_info);
+if (check_interactive(shell_info))
 _puts("$ ");
 print_error_char(BUF_FLUSH);
-read_status = get_input(shell_info);
+read_status = get_user_input(shell_info);
 if (read_status != -1)
 {
-set_info(shell_info, arguments);
+populate_info(shell_info, arguments);
 builtin_return = find_builtin(shell_info);
 if (builtin_return == -1)
 find_command(shell_info);
 }
-else if (is_interactive(shell-info))
+else if (check_interactive(shell_info))
 _putchar('\n');
-free_info(shell_info, 0);
+release_info(shell_info, 0);
 }
-write_history(ishell_info);
-free_info(shell_info, 1);
-if (!is_interactive(shell_info) && shell_info->status)
+save_history(shell_info);
+release_info(shell_info, 1);
+if (!check_interactive(shell_info) && shell_info->status)
 exit(shell_info->status);
 if (builtin_return == -2)
 {
@@ -59,7 +59,7 @@ builtin_table builtintbl[] = {
 {"exit",custom_exit},
 {"env", custom_environment},
 {"help", custom_help},
-{"history", command_history},
+{"history", custom_history},
 {"setenv", set_environment},
 {"unsetenv", remove_environment},
 {"cd", custom_cd},
@@ -68,10 +68,10 @@ builtin_table builtintbl[] = {
 };
 
 for (i = 0; builtintbl[i].type; i++)
-if (_strcmp(shell_info->argv[0], builtintbl[i].type) == 0)
+if (str_compare(shell_info->argv[0], builtintbl[i].type) == 0)
 {
 shell_info->line_count++;
-built_in_return = builtintbl[i].func(info_struct);
+built_in_return = builtintbl[i].func(shell_info);
 break;
 }
 return (built_in_return);
@@ -100,7 +100,7 @@ count_tokens++;
 if (!count_tokens)
 return;
 
-path = find_command_path(shell_info, _getenv(shell_info, "PATH="), shell_info->argv[0]);
+path = find_command_path(shell_info, _get_environment(shell_info, "PATH="), shell_info->argv[0]);
 if (path)
 {
 shell_info->path = path;
@@ -108,7 +108,7 @@ fork_command(shell_info);
 }
 else
 {
-if ((is_interactive(shell_info) || _getenv(shell_info, "PATH=")
+if ((check_interactive(shell_info) || _get_environment(shell_info, "PATH=")
 || shell_info->argv[0][0] == '/') && is_executable_command(shell_info, shell_info->argv[0]))
 fork_command(shell_info);
 else if (*(shell_info->arg) != '\n')
@@ -140,7 +140,7 @@ if (child_pid == 0)
 {
 if (execve(shell_info->path, shell_info->argv, get_environment(shell_info)) == -1)
 {
-free_info(shell_info, 1);
+release_info(shell_info, 1);
 if (errno == EACCES)
 exit(126);
 exit(1);

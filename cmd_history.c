@@ -7,7 +7,7 @@
  * Return: Allocated string containing the history file path
  */
 
-char *get_history_filepath(info_t *shell_info)
+cchar *get_history_filepath(info_t *shell_info)
 {
 char *buf, *dir,
 

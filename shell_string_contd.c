@@ -1,12 +1,12 @@
 #include "shell.h"
 
 /**
-* _strcpy - copies a string
+* string_copy - copies a string
 * @destination: the destination
 * @source: the source
 * Return: pointer to destination
 */
-char *_strcpy(char *destination, char *source)
+char *string_copy(char *destination, char *source)
 {
 int index = 0;
 if (destination == source || source == NULL)
@@ -21,11 +21,11 @@ return (destination);
 }
 
 /**
-* _strdup - duplicates a string
+* string_duplicate - duplicates a string
 * @str: the string to duplicate
 * Return: pointer to the duplicated string
 */
-char *_strdup(const char *str)
+char *string_duplicate(const char *str)
 {
 int length = 0;
 char *result;
