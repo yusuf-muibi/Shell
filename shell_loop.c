@@ -36,9 +36,9 @@ if (!check_interactive(shell_info) && shell_info->status)
 exit(shell_info->status);
 if (builtin_return == -2)
 {
-if (shell_info->error_number == -1)
+if (shell_info->err_num == -1)
 exit(shell_info->status);
-exit(shell_info->error_number);
+exit(shell_info->err_num);
 }
 return (builtin_return);
 }
@@ -56,7 +56,7 @@ int find_builtin(info_t *shell_info)
 {
 int i, built_in_return = -1;
 builtin_table builtintbl[] = {
-{"exit",custom_exit},
+{"exit", custom_exit},
 {"env", custom_environment},
 {"help", custom_help},
 {"history", custom_history},
@@ -88,7 +88,7 @@ void find_command(info_t *shell_info)
 char *path = NULL;
 int i, count_tokens;
 
-shell_info->path = shell_info>argv[0];
+shell_info->path = shell_info->argv[0];
 if (shell_info->linecount_flag == 1)
 {
 shell_info->line_count++;
@@ -100,7 +100,8 @@ count_tokens++;
 if (!count_tokens)
 return;
 
-path = find_command_path(shell_info, _get_environment(shell_info, "PATH="), shell_info->argv[0]);
+path = find_command_path(shell_info, _get_environment(shell_info, "PATH="),
+shell_info->argv[0]);
 if (path)
 {
 shell_info->path = path;
@@ -109,7 +110,8 @@ fork_command(shell_info);
 else
 {
 if ((check_interactive(shell_info) || _get_environment(shell_info, "PATH=")
-|| shell_info->argv[0][0] == '/') && is_executable_command(shell_info, shell_info->argv[0]))
+|| shell_info->argv[0][0] == '/') &&
+is_executable_command(shell_info, shell_info->argv[0]))
 fork_command(shell_info);
 else if (*(shell_info->arg) != '\n')
 {
@@ -138,7 +140,8 @@ return;
 }
 if (child_pid == 0)
 {
-if (execve(shell_info->path, shell_info->argv, get_environment(shell_info)) == -1)
+if (execve(shell_info->path, shell_info->argv,
+get_environment(shell_info)) == -1)
 {
 release_info(shell_info, 1);
 if (errno == EACCES)
