@@ -81,14 +81,14 @@ char *p;
 
 for (i = 0; i < 10; i++)
 {
-node = node_starts_with(shell_info->alias, shell_info->argv[0], '=');
+node = find_matching_node(shell_info->alias, shell_info->argv[0], '=');
 if (!node)
 return (0);
 free(shell_info->argv[0]);
 p = custom_strchr(node->str, '=');
 if (!p)
 return (0);
-p = _strdup(p + 1);
+p = string_duplicate(p + 1);
 if (!p)
 return (0);
 shell_info->argv[0] = p;
@@ -111,26 +111,26 @@ for (i = 0; shell_info->argv[i]; i++)
 if (shell_info->argv[i][0] != '$' || !shell_info->argv[i][1])
 continue;
 
-if (!_strcmp(shell_info->argv[i], "$?"))
+if (!str_compare(shell_info->argv[i], "$?"))
 {
-replace_string(&(shell_info->argv[i]),
-_strdup(convert_number(shell_info->status, 10, 0)));
+replace_string_content(&(shell_info->argv[i]),
+string_duplicate(convert_to_string(shell_info->status, 10, 0)));
 continue;
 }
-if (!_strcmp(shell_info->argv[i], "$$"))
+if (!str_compare(shell_info->argv[i], "$$"))
 {
-replace_string(&(shell_info->argv[i]),
-_strdup(convert_number(getpid(), 10, 0)));
+replace_string_content(&(shell_info->argv[i]),
+string_duplicate(convert_to_string(getpid(), 10, 0)));
 continue;
 }
-node = node_starts_with(shell_info->env, &shell_info->argv[i][1], '=');
+node = find_matching_node(shell_info->env, &shell_info->argv[i][1], '=');
 if (node)
 {
-replace_string(&(shell_info->argv[i]),
-_strdup(_strchr(node->str, '=') + 1));
+replace_string_content(&(shell_info->argv[i]),
+string_duplicate(custom_strchr(node->str, '=') + 1));
 continue;
 }
-replace_string(&shell_info->argv[i], _strdup(""));
+replace_string_content(&shell_info->argv[i], string_duplicate(""));
 
 }
 return (0);
@@ -142,7 +142,7 @@ return (0);
 * @new_content: new string content
 * Return: 1 if replaced, 0 otherwise
 */
-replace_string_content(char **old_content, int  char *new_content)
+int replace_string_content(char **old_content, char *new_content)
 {
 free(*old_content);
 *old_content = new_content;
