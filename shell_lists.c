@@ -23,7 +23,7 @@ new_head->index = index;
 
 if (data)
 {
-new_head->data = _strdup(data);
+new_head->data = string_duplicate(data);
 if (!new_head->data)
 {
 free(new_head);
@@ -61,7 +61,7 @@ new_node->index = index;
 
 if (data)
 {
-new_node->data = _strdup(data);
+new_node->data = string_duplicate(data);
 if (!new_node->data)
 {
 free(new_node);

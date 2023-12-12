@@ -70,9 +70,9 @@ return (0);
 buf = malloc(_strlen(variable) + _strlen(value) + 2);
 if (!buf)
 return (1);
-_strcpy(buf, variable);
-_strcat(buf, "=");
-_strcat(buf, value);
+string_copy(buf, variable);
+string_concat(buf, "=");
+string_concat(buf, value);
 node = shell_info->env;
 while (node)
 {

@@ -30,7 +30,7 @@ if (!shell_info->argv)
 shell_info->argv = malloc(sizeof(char *) * 2);
 if (shell_info->argv)
 {
-shell_info->argv[0] = _strdup(shell_info->arg);
+shell_info->argv[0] = string_duplicate(shell_info->arg);
 shell_info->argv[1] = NULL;
 }
 }
@@ -59,8 +59,8 @@ if (!shell_info->cmd_buf)
 free(shell_info->arg);
 if (shell_info->env)
 free_list_nodes(&(shell_info->env));
-if (shell_info->history)
-free_list_nodes(&(shell_info->history));
+if (shell_info->command_history)
+free_list_nodes(&(shell_info->command_history));
 if (shell_info->alias)
 free_list_nodes(&(shell_info->alias));
 ffree(shell_info->environ);

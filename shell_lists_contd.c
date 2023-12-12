@@ -47,7 +47,7 @@ free(strings_array);
 return (NULL);
 }
 
-string = _strcpy(string, nodes->string);
+string = string_copy(string, nodes->string);
 strings_array[list_size] = string;
 }
 strings_array[list_size] = NULL;
