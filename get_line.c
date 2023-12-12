@@ -64,7 +64,7 @@ p = buf + i; /* get pointer for return */
 check_cmd_chain(shell_info, buf, &j, i, len);
 while (j < len) /* iterate to semicolon or end */
 {
-if (is_chain(shell_info, buf, &j))
+if (is_command_chain(shell_info, buf, &j))
 break;
 j++;
 }
@@ -124,7 +124,7 @@ s = *length;
 if (i == len)
 i = len = 0;
 
-r = read_buffer(info, buf, &len);
+r = read_buffer(shell_info, buf, &len);
 if (r == -1 || (r == 0 && len == 0))
 return (-1);
 

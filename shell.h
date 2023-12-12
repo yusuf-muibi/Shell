@@ -32,7 +32,7 @@
 #define USE_STRTOK 0
 
 #define HISTORY_FILE 	".simple_shell_history"
-#define HIST_MAX	4096
+#define HISTORY_MAX	4096
 
 extern char **environ;
 
@@ -92,7 +92,7 @@ int status;
 char **cmd_buf; /* pointer to cmd ; chain buffer, for memory management */
 int cmd_buf_type; /* CMD_type ||, &&, ; */
 int readfd;
-int histcount;
+int history_count;
 } info_t;
 
 #define INFO_INIT {NULL, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, \
@@ -170,7 +170,7 @@ void release_info(info_t *shell_info, int all);
 char *get_history_filepath(info_t *shell_info);
 int save_history(info_t *shell_info);
 int load_history(info_t *shell_info);
-int add_history_entry(info_t *shell_info, char *buffer, int line_count);
+int add_history_entry(info_t *shell_info, char *buf, int line_count);
 int update_history_count(info_t *shell_info);
 
 /* definition_lists.c */
