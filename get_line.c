@@ -31,7 +31,7 @@ r--;
 }
 shell_info->linecount_flag = 1;
 erase_comments(*buf);
-add_history_entry(shell_info, *buf, shell_info->histcount++);
+add_history_entry(shell_info, *buf, shell_info->history_count++);
 {
 *len = r;
 shell_info->cmd_buf = buf;
