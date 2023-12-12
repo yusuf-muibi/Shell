@@ -49,7 +49,7 @@ chdir((dir = _get_environment(shell_info, "PWD=")) ? dir : "/");
 else
 chdir_ret = chdir(dir);
 }
-else if (_strcmp(shell_info->argv[1], "-") == 0)
+else if (str_compare(shell_info->argv[1], "-") == 0)
 {
 if (!_get_environment(shell_info, "OLDPWD="))
 {
