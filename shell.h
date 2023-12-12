@@ -42,10 +42,15 @@ extern char **environ;
 * @num: the number field
 * @str: a string
 * @next: points to the next node
+* @data: data for the list
+* @index: index for the list
 */
 typedef struct liststr
 {
+char *data;
+int index;
 int num;
+char *string;
 char *str;
 struct liststr *next;
 } list_t;
