@@ -88,7 +88,7 @@ int err_num;
 int linecount_flag;
 char *fname;
 list_t *env;
-list_t *history;
+list_t *command_history;
 list_t *alias;
 char **environ;
 int env_changed;
@@ -213,16 +213,16 @@ char **split_string(char *str, char *delimiters);
 char **split_string_v2(char *str, char delimiter);
 
 /* definition - string1.c*/
-char *_strcpy(char *destination, char *source);
-char *_strdup(const char *str);
+char *string_copy(char *destination, char *source);
+char *string_duplicate(const char *str);
 void _puts(char *str);
 int _putchar(char c);
 
 /* definition - string.c*/
 int _strlen(char *str);
-int _strcmp(char *s1, char *s2);
+int str_compare(char *s1, char *s2);
 char *starts_with(const char *haystack, const char *needle);
-char *_strcat(char *destination, char *source);
+char *string_concat(char *destination, char *source);
 
 /* definition - shell_loop.c*/
 int shell_loop(info_t *shell_info, char **arguments);

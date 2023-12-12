@@ -3,25 +3,24 @@
 /**
  * get_history_filepath - Retrieves the history file path
  * @shell_info: Parameter struct
+ * 
  * Return: Allocated string containing the history file path
  */
+
 char *get_history_filepath(info_t *shell_info)
 {
-char *buffer, *home_dir,
+char *buf, *dir,
 
-dir = get_environment(shell_info, "HOME=");
+dir = _get_environment(shell_info, "HOME=");
 if (!dir)
 return (NULL);
-
-file_path = malloc(sizeof(char) * (_strlen(home_dir) + _strlen(HISTORY_FILE) + 2));
+buf = malloc(sizeof(char) * (_strlen(dir) + _strlen(HISTORY_FILE) + 2));
 if (!buf)
 return (NULL);
-
 buf[0] = 0;
 string_copy(buf, dir);
 string_concat(buf, "/");
 string_concat(buf, HISTORY_FILE);
-
 return (buf);
 }
 
@@ -42,16 +41,13 @@ return (-1);
 
 file_desc = open(file_name, O_CREAT | O_TRUNC | O_RDWR, 0644);
 free(file_name);
-
 if (file_desc == -1)
 return (-1);
-
 for (node = shell_info->command_history; node; node = node->next)
 {
 print_string_to_fd(node->str, file_desc);
 print_to_fd('\n', file_desc);
 }
-
 print_to_fd(BUF_FLUSH, file_desc);
 close(file_desc);
 
@@ -113,9 +109,9 @@ free(buf);
 shell_info->history_count = line_count;
 
 while (shell_info->history_count-- >= HISTORY_MAX)
-delete_node_at_index(&(shell_info->command_history), 0);
+delete_node_at_list_index(&(shell_info->command_history), 0);
 
-renumber_history(shell_info);
+update_history_count(shell_info);
 
 return (shell_info->history_count);
 }
@@ -135,7 +131,7 @@ list_t *node = NULL;
 if (shell_info->command_history)
 node = shell_info->command_history;
 
-add_node_end(&node, buf, line_count);
+add_list_node_end(&node, buf, line_count);
 
 if (!shell_info->command_history)
 shell_info->command_history = node;
