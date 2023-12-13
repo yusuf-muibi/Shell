@@ -1,81 +1,75 @@
 #include "shell.h"
-
 /**
-* string_copy - copies a string
-* @destination: the destination
-* @source: the source
-* Return: pointer to destination
+* strcpy_custom - Copies a string.
+* @dest: The destination buffer to store the copied string.
+* @src: The source buffer containing the string to be copied.
+* Return: A pointer to the destination buffer.
 */
-char *string_copy(char *destination, char *source)
+char *_strcpy(char *dest, char *src)
 {
-int index = 0;
-if (destination == source || source == NULL)
-return (destination);
-while (source[index])
+int i = 0;
+if (dest == src || src == 0)
+return (dest);
+while (src[i])
 {
-destination[index] = source[index];
-index++;
+dest[i] = src[i];
+i++;
 }
-destination[index] = '\0';
-return (destination);
+dest[i] = 0;
+return (dest);
 }
-
 /**
-* string_duplicate - duplicates a string
-* @str: the string to duplicate
-* Return: pointer to the duplicated string
+* strdup_custom - Creates a duplicate of a given string.
+* @str: The string to be duplicated.
+* Return: A pointer to the duplicated string.
 */
-char *string_duplicate(const char *str)
+Chat	r *_strdup(const char *str)
 {
 int length = 0;
-char *result;
+char *ret;
 if (str == NULL)
 return (NULL);
 while (*str++)
 length++;
-result = malloc(sizeof(char) * (length + 1));
-if (!result)
+ret = malloc(sizeof(char) * (length + 1));
+if (!ret)
 return (NULL);
 for (length++; length--;)
-result[length] = *--str;
-return (result);
+ret[length] = *--str;
+return (ret);
 }
-
 /**
-* _puts - prints an input string
-* @str: the string to be printed
-* Return: Nothing
+* puts_custom - Prints a provided string.
+* @str: The string to be printed.
+* Return: No specific return value.
 */
 void _puts(char *str)
 {
-int index = 0;
-
+int i = 0;
 if (!str)
 return;
-while (str[index] != '\0')
+while (str[i] != '\0')
 {
-_putchar(str[index]);
-index++;
+_putchar(str[i]);
+i++;
 }
 }
-
 /**
-* _putchar - writes the character c to stdout
-* @c: The character to print
-* Return: On success 1.
+* putchar_custom - Writes the character 'c' to the standard output.
+* @c: The character to be printed.
+* Return: Returns 1 on success.
 * On error, -1 is returned, and errno is set appropriately.
 */
 int _putchar(char c)
 {
-static int index;
-static char buffer[WRITE_BUF_SIZE];
-
-if (c == BUF_FLUSH || index >= WRITE_BUF_SIZE)
+static int i;
+static char buf[WRITE_BUF_SIZE];
+if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
 {
-write(1, buffer, index);
-index = 0;
+write(1, buf, i);
+i = 0;
 }
 if (c != BUF_FLUSH)
-buffer[index++] = c;
+buf[i++] = c;
 return (1);
 }

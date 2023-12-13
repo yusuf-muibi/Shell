@@ -1,29 +1,27 @@
 #include "shell.h"
-
 /**
-* _strlen - returns the length of a string
-* @str: the string whose length to check
-* Return: integer length of string
+* _strlen - Computes the length of a string.
+* @s: The string whose length to check.
+* Return: Integer length of the string.
 */
-int _strlen(char *str)
+int _strlen(char *s)
 {
-int length = 0;
-
-if (!str)
+int i = 0;
+if (!s)
 return (0);
-
-while (*str++)
-length++;
-return (length);
+while (*s++)
+i++;
+return (i);
 }
-
 /**
-*str_compare - performs lexicographic comparison of two strings.
-* @s1: the first string
-* @s2: the second string
-* Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
+* _strcmp - Compares two strings lexicographically.
+* @s1: The first string.
+* @s2: The second string.
+* Return: Negative if s1 is less than s2,
+*         Positive if s1 is greater than s2,
+*         Zero if s1 is equal to s2.
 */
-int str_compare(char *s1, char *s2)
+int _strcmp(char *s1, char *s2)
 {
 while (*s1 && *s2)
 {
@@ -37,12 +35,11 @@ return (0);
 else
 return (*s1 < *s2 ? -1 : 1);
 }
-
 /**
-* starts_with - checks if needle starts with haystack
-* @haystack: string to search
-* @needle: the substring to find
-* Return: address of next char of haystack or NULL
+* starts_with - Checks if the needle starts with the haystack.
+* @haystack: String to search.
+* @needle: The substring to find.
+* Return: Address of the next character in haystack or NULL.
 */
 char *starts_with(const char *haystack, const char *needle)
 {
@@ -51,21 +48,19 @@ if (*needle++ != *haystack++)
 return (NULL);
 return ((char *)haystack);
 }
-
 /**
-* string_concat - concatenates two strings
-* @destination: the destination buffer
-* @source: the source buffer
-* Return: pointer to destination buffer
+* strcat_custom - Concatenates two strings into a single string.
+* @dest: The destination buffer to store the concatenated strings.
+* @src: The source buffer containing the string to be appended.
+* Return: A pointer to the destination buffer with the concatenated strings.
 */
-char *string_concat(char *destination, char *source)
+char *_strcat(char *dest, char *src)
 {
-char *result = destination;
-
-while (*destination)
-destination++;
-while (*source)
-*destination++ = *source++;
-*destination = *source;
-return (result);
+char *ret = dest;
+while (*dest)
+dest++;
+while (*src)
+*dest++ = *src++;
+*dest = *src;
+return (ret);
 }

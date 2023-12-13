@@ -1,163 +1,145 @@
 #include "shell.h"
-
 /**
- * shell_loop - main shell loop
- * @shell_info: the parameter & return info struct
- * @arguments: the argument vector from main()
- *
- * Return: 0 on success, 1 on error, or error code
- */
-int shell_loop(info_t *shell_info, char **arguments)
+* hsh - Main loop for the shell.
+* @inform: The parameter and return info struct.
+* @av: The argument vector from main().
+* Return: 0 on success, 1 on error, or an error code.
+*/
+int hsh(inform_t *inform, char **av)
 {
-ssize_t read_status = 0;
-int builtin_return = 0;
-
-while (read_status != -1 && builtin_return != -2)
+ssize_t r = 0;
+int builtin_ret = 0;
+while (r != -1 && builtin_ret != -2)
 {
-initialize_info(shell_info);
-if (check_interactive(shell_info))
+clear_inform(inform);
+if (interactive(inform))
 _puts("$ ");
-print_error_char(BUF_FLUSH);
-read_status = get_user_input(shell_info);
-if (read_status != -1)
+_eputchar(BUF_FLUSH);
+r = get_input(inform);
+if (r != -1)
 {
-populate_info(shell_info, arguments);
-builtin_return = find_builtin(shell_info);
-if (builtin_return == -1)
-find_command(shell_info);
+set_inform(inform, av);
+builtin_ret = find_builtin(inform);
+if (builtin_ret == -1)
+find_cmd(inform);
 }
-else if (check_interactive(shell_info))
+else if (interactive(inform))
 _putchar('\n');
-release_info(shell_info, 0);
+free_inform(inform, 0);
 }
-save_history(shell_info);
-release_info(shell_info, 1);
-if (!check_interactive(shell_info) && shell_info->status)
-exit(shell_info->status);
-if (builtin_return == -2)
+write_history(inform);
+free_inform(inform, 1);
+if (!interactive(inform) && inform->status)
+exit(inform->status);
+if (builtin_ret == -2)
 {
-if (shell_info->err_num == -1)
-exit(shell_info->status);
-exit(shell_info->err_num);
+if (inform->err_num == -1)
+exit(inform->status);
+exit(inform->err_num);
 }
-return (builtin_return);
+return (builtin_ret);
 }
-
 /**
- * find_builtin - finds a builtin command
- * @shell_info: the parameter & return info struct
- *
- * Return: -1 if builtin not found,
- *          0 if builtin executed successfully,
- *          1 if builtin found but not successful,
- *         -2 if builtin signals exit()
- */
-int find_builtin(info_t *shell_info)
+* find_builtin - Identifies a builtin command.
+* @inform: The parameter and return info struct.
+* Return: -1 if builtin not found,
+*          0 if builtin executed successfully,
+*          1 if builtin found but encountered an issue,
+*         -2 if builtin signals an exit().
+*/
+int find_builtin(inform_t *inform)
 {
-int i, built_in_return = -1;
+int i, built_in_ret = -1;
 builtin_table builtintbl[] = {
-{"exit", custom_exit},
-{"env", custom_environment},
-{"help", custom_help},
-{"history", custom_history},
-{"setenv", set_environment},
-{"unsetenv", remove_environment},
-{"cd", custom_cd},
-{"alias", custom_alias},
+{"exit", _ourexit},
+{"env", _ourenv},
+{"help", _ourhelp},
+{"history", _ourhistory},
+{"setenv", _oursetenv},
+{"unsetenv", _ourunsetenv},
+{"cd", _ourcd},
+{"alias", _ouralias},
 {NULL, NULL}
 };
-
 for (i = 0; builtintbl[i].type; i++)
-if (str_compare(shell_info->argv[0], builtintbl[i].type) == 0)
+if (_strcmp(inform->argv[0], builtintbl[i].type) == 0)
 {
-shell_info->line_count++;
-built_in_return = builtintbl[i].func(shell_info);
+inform->line_count++;
+built_in_ret = builtintbl[i].func(inform);
 break;
 }
-return (built_in_return);
+return (built_in_ret);
 }
-
 /**
- * find_command - finds a command in PATH
- * @shell_info: the parameter & return info struct
- *
- * Return: void
- */
-void find_command(info_t *shell_info)
+* find_cmd - Searches for a command in the PATH.
+* @inform: The parameter and return info struct.
+* Return: Void.
+*/
+void find_cmd(inform_t *inform)
 {
 char *path = NULL;
-int i, count_tokens;
-
-shell_info->path = shell_info->argv[0];
-if (shell_info->linecount_flag == 1)
+int i, k;
+inform->path = inform->argv[0];
+if (inform->linecount_flag == 1)
 {
-shell_info->line_count++;
-shell_info->linecount_flag = 0;
+inform->line_count++;
+inform->linecount_flag = 0;
 }
-for (i = 0, count_tokens = 0; shell_info->arg[i]; i++)
-if (!is_delimiter(shell_info->arg[i], " \t\n"))
-count_tokens++;
-if (!count_tokens)
+for (i = 0, k = 0; inform->arg[i]; i++)
+if (!is_delimet(inform->arg[i], " \t\n"))
+k++;
+if (!k)
 return;
-
-path = find_command_path(shell_info, _get_environment(shell_info, "PATH="),
-shell_info->argv[0]);
+path = find_path(inform, _getenv(inform, "PATH="), inform->argv[0]);
 if (path)
 {
-shell_info->path = path;
-fork_command(shell_info);
+inform->path = path;
+fork_cmd(inform);
 }
 else
 {
-if ((check_interactive(shell_info) || _get_environment(shell_info, "PATH=")
-|| shell_info->argv[0][0] == '/') &&
-is_executable_command(shell_info, shell_info->argv[0]))
-fork_command(shell_info);
-else if (*(shell_info->arg) != '\n')
+if ((interactive(inform) || _getenv(inform, "PATH=")
+|| inform->argv[0][0] == '/') && is_cmd(inform, inform->argv[0]))
+fork_cmd(inform);
+else if (*(inform->arg) != '\n')
 {
-shell_info->status = 127;
-print_error_message(shell_info, "not found\n");
+inform->status = 127;
+print_error(inform, "not found\n");
 }
 }
 }
-
 /**
- * fork_command - forks an exec thread to run command
- * @shell_info: the parameter & return info struct
- *
- * Return: void
- */
-void fork_command(info_t *shell_info)
+* fork_cmd - Forks an execution thread to run a command.
+* @inform: The parameter and return info struct.
+* Return: Void.
+*/
+void fork_cmd(inform_t *inform)
 {
 pid_t child_pid;
-
 child_pid = fork();
 if (child_pid == -1)
 {
-/* TODO: PUT ERROR FUNCTION */
 perror("Error:");
 return;
 }
 if (child_pid == 0)
 {
-if (execve(shell_info->path, shell_info->argv,
-get_environment(shell_info)) == -1)
+if (execve(inform->path, inform->argv, get_environ(inform)) == -1)
 {
-release_info(shell_info, 1);
+free_inform(inform, 1);
 if (errno == EACCES)
 exit(126);
 exit(1);
 }
-/* TODO: PUT ERROR FUNCTION */
 }
 else
 {
-wait(&(shell_info->status));
-if (WIFEXITED(shell_info->status))
+wait(&(inform->status));
+if (WIFEXITED(inform->status))
 {
-shell_info->status = WEXITSTATUS(shell_info->status);
-if (shell_info->status == 126)
-print_error_message(shell_info, "Permission denied\n");
+inform->status = WEXITSTATUS(inform->status);
+if (inform->status == 126)
+print_error(inform, "Permission denied\n");
 }
 }
 }

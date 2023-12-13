@@ -1,150 +1,137 @@
 #include "shell.h"
-
 /**
-* is_command_chain - tests if the current char in buffer is a chain delimiter
-* @shell_info: the parameter struct
-* @buffer: the char buffer
-* @position: address of the current position in buffer
-* Return: 1 if chain delimiter, 0 otherwise
+* is_chain - Checks if the current character in the buffer is a chain delimiter.
+* @inform: The parameter struct.
+* @buf: The character buffer.
+* @p: The address of the current position in the buffer.
+* Return: 1 if it's a chain delimiter, 0 otherwise.
 */
-int is_command_chain(info_t *shell_info, char *buffer, size_t *position)
+int is_chain(inform_t *inform, char *buf, size_t *p)
 {
-size_t j = *position;
-
-if (buffer[j] == '|' && buffer[j + 1] == '|')
+size_t j = *p;
+if (buf[j] == '|' && buf[j + 1] == '|')
 {
-buffer[j] = 0;
+buf[j] = 0;
 j++;
-shell_info->cmd_buf_type = CMD_OR;
+inform->cmd_buf_type = CMD_OR;
 }
-else if (buffer[j] == '&' && buffer[j + 1] == '&')
+else if (buf[j] == '&' && buf[j + 1] == '&')
 {
-buffer[j] = 0;
+buf[j] = 0;
 j++;
-shell_info->cmd_buf_type = CMD_AND;
+inform->cmd_buf_type = CMD_AND;
 }
-else if (buffer[j] == ';') /* found end of this command */
+else if (buf[j] == ';') /* found end of this command */
 {
-buffer[j] = 0; /* replace semicolon with null */
-shell_info->cmd_buf_type = CMD_CHAIN;
+buf[j] = 0; /* replace semicolon with null */
+inform->cmd_buf_type = CMD_CHAIN;
 }
 else
 return (0);
-*position = j;
+*p = j;
 return (1);
 }
-
 /**
-* check_cmd_chain - checks if to continue chaining based on the last status
-* @shell_info: the parameter struct
-* @buffer: the char buffer
-* @position: address of the current position in buffer
-* @start: starting position in buffer
-* @length: length of buffer
-* Return: Void
+* check_chain - Examines whether we should continue chaining based on the last status.
+* @inform: The parameter struct.
+* @buf: The character buffer.
+* @p: The address of the current position in the buffer.
+* @i: The starting position in the buffer.
+* @len: The length of the buffer.
+* Return: Void.
 */
-void check_cmd_chain(info_t *shell_info,
-char *buffer, size_t *position, size_t start, size_t length)
+void check_chain(inform_t *inform, char *buf, size_t *p, size_t i, size_t len)
 {
-size_t j = *position;
-
-if (shell_info->cmd_buf_type == CMD_AND)
+size_t j = *p;
+if (inform->cmd_buf_type == CMD_AND)
 {
-if (shell_info->status)
+if (inform->status)
 {
-buffer[start] = 0;
-j = length;
+buf[i] = 0;
+j = len;
 }
 }
-if (shell_info->cmd_buf_type == CMD_OR)
+if (inform->cmd_buf_type == CMD_OR)
 {
-if (!shell_info->status)
+if (!inform->status)
 {
-buffer[start] = 0;
-j = length;
+buf[i] = 0;
+j = len;
 }
 }
-
-*position = j;
+*p = j;
 }
-
 /**
-* replace_cmd_alias - replaces an alias in the tokenized string
-* @shell_info: the parameter struct
-* Return: 1 if replaced, 0 otherwise
+* replace_alias - Substitutes aliases in the tokenized string.
+* @inform: The parameter struct.
+* Return: 1 if replaced, 0 otherwise.
 */
-int replace_cmd_alias(info_t *shell_info)
+int replace_alias(inform_t *inform)
 {
 int i;
 list_t *node;
 char *p;
-
 for (i = 0; i < 10; i++)
 {
-node = find_matching_node(shell_info->alias, shell_info->argv[0], '=');
+node = node_starts_with(inform->alias, inform->argv[0], '=');
 if (!node)
 return (0);
-free(shell_info->argv[0]);
-p = custom_strchr(node->str, '=');
+free(inform->argv[0]);
+p = _strchr(node->str, '=');
 if (!p)
 return (0);
-p = string_duplicate(p + 1);
+p = _strdup(p + 1);
 if (!p)
 return (0);
-shell_info->argv[0] = p;
+inform->argv[0] = p;
 }
 return (1);
 }
-
 /**
-* replace_cmd_vars - replaces vars in the tokenized string
-* @shell_info: the parameter struct
-* Return: 1 if replaced, 0 otherwise
+* replace_vars - Substitutes variables in the tokenized string.
+* @inform: The parameter struct.
+* Return: 1 if replaced, 0 otherwise.
 */
-int replace_cmd_vars(info_t *shell_info)
+int replace_vars(inform_t *inform)
 {
 int i = 0;
 list_t *node;
-
-for (i = 0; shell_info->argv[i]; i++)
+for (i = 0; inform->argv[i]; i++)
 {
-if (shell_info->argv[i][0] != '$' || !shell_info->argv[i][1])
+if (inform->argv[i][0] != '$' || !inform->argv[i][1])
 continue;
-
-if (!str_compare(shell_info->argv[i], "$?"))
+if (!_strcmp(inform->argv[i], "$?"))
 {
-replace_string_content(&(shell_info->argv[i]),
-string_duplicate(convert_to_string(shell_info->status, 10, 0)));
+replace_string(&(inform->argv[i]),
+_strdup(convert_number(inform->status, 10, 0)));
 continue;
 }
-if (!str_compare(shell_info->argv[i], "$$"))
+if (!_strcmp(inform->argv[i], "$$"))
 {
-replace_string_content(&(shell_info->argv[i]),
-string_duplicate(convert_to_string(getpid(), 10, 0)));
+replace_string(&(inform->argv[i]),
+_strdup(convert_number(getpid(), 10, 0)));
 continue;
 }
-node = find_matching_node(shell_info->env, &shell_info->argv[i][1], '=');
+node = node_starts_with(inform->env, &inform->argv[i][1], '=');
 if (node)
 {
-replace_string_content(&(shell_info->argv[i]),
-string_duplicate(custom_strchr(node->str, '=') + 1));
+replace_string(&(inform->argv[i]),
+_strdup(_strchr(node->str, '=') + 1));
 continue;
 }
-replace_string_content(&shell_info->argv[i], string_duplicate(""));
-
+replace_string(&inform->argv[i], _strdup(""));
 }
 return (0);
 }
-
 /**
-* replace_string_content - replaces string content
-* @old_content: address of the old string content
-* @new_content: new string content
-* Return: 1 if replaced, 0 otherwise
+* replace_string - Substitutes a string.
+* @old: The address of the old string.
+* @new: The new string.
+* Return: 1 if replaced, 0 otherwise.
 */
-int replace_string_content(char **old_content, char *new_content)
+int replace_string(char **old, char *new)
 {
-free(*old_content);
-*old_content = new_content;
+free(*old);
+*old = new;
 return (1);
 }
